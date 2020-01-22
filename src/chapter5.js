@@ -13,7 +13,7 @@ export default new p5(p => {
       value: '#000000'
     },
     steps: {
-      value: 50,
+      value: 30,
       min: 10,
       max: 100
     },
@@ -28,7 +28,7 @@ export default new p5(p => {
       min: 1
     },
     scaleFactor: {
-      value: 2,
+      value: 4,
       min: 1,
       max: 5,
       step: 0.25
@@ -55,10 +55,6 @@ export default new p5(p => {
       value: true,
       callback: (val, p) => val ? p.loop() : p.noLoop()
     },
-    frameRate: {
-      type: 'text',
-      value: 0
-    },
     saveButton: {
       type: 'button',
       label: 'Save image',
@@ -70,6 +66,7 @@ export default new p5(p => {
   }
 
   p.setup = () => {
+    p.disableFriendlyErrors = true
     p.createCanvas(p.windowWidth, p.windowHeight)
     p.colorMode(p.HSL)
 
@@ -87,50 +84,56 @@ export default new p5(p => {
     p.rectMode(p.CENTER)
     p.strokeCap(p.SQUARE)
     p.blendMode(p.ADD)
-
-    window.setInterval(() => {
-      ui.frameRate = p.frameRate().toFixed(2)
-    }, 1000)
   }
 
   p.draw = () => {
     clear()
 
-    const
-      xStep = p.windowWidth / ui.steps,
-      yStep = p.windowHeight / ui.steps
+    const {
+      noiseFactor,
+      strokeWeight,
+      scaleFactor,
+      steps,
+      drawArcs,
+      drawLines,
+      drawRects,
+    } = ui
 
-    for(let y = 0; y <= p.windowHeight; y = y + yStep) {
-      for(let x = 0; x <= p.windowWidth; x = x + xStep) {
+    const { windowHeight, windowWidth, TWO_PI } = p
+    p.strokeWeight(strokeWeight)
+
+    const
+      xStep = windowWidth / steps,
+      yStep = windowHeight / steps
+
+    for(let y = 0; y <= windowHeight; y = y + yStep) {
+      for(let x = 0; x <= windowWidth; x = x + xStep) {
         const
           xpos = x + xStep/2,
           ypos = y + yStep/2,
-          zpos = cachedFrameCount / ui.noiseFactor,
-          noise = p.noise((xpos + noiseXPosition) / ui.noiseFactor, (ypos + noiseYPosition) / ui.noiseFactor, zpos),
-          alpha = noise,
+          zpos = cachedFrameCount / noiseFactor,
+          noise = p.noise((xpos + noiseXPosition) / noiseFactor, (ypos + noiseYPosition) / noiseFactor, zpos),
           xSize = noise * xStep,
           ySize = noise * yStep,
-          xSizeScaled = noise * xStep * ui.scaleFactor,
-          ySizeScaled = noise * yStep * ui.scaleFactor,
-          hue = noise * 360,
-          col = p.color(hue, 50, 50, alpha)
+          xSizeScaled = xSize * scaleFactor,
+          ySizeScaled = ySize * scaleFactor,
+          col = p.color(noise * 360, 50, 50, noise)
 
-        p.strokeWeight(ui.strokeWeight)
         p.stroke(col)
         p.push()
         p.translate(xpos, ypos)
+        p.rotate(noise * TWO_PI)
 
-        if(ui.drawLines) {
-          p.rotate(noise * p.TWO_PI)
+        if(drawLines) {
           p.line(xSizeScaled * -0.5, ySizeScaled * -0.5, xSizeScaled * 0.5, ySizeScaled * 0.5)
         }
 
-        if(ui.drawArcs) {
+        if(drawArcs) {
           p.noFill()
-          p.arc(0, 0, xSizeScaled, ySizeScaled, 0, noise * p.TWO_PI)
+          p.arc(0, 0, xSizeScaled, ySizeScaled, 0, noise * TWO_PI)
         }
 
-        if(ui.drawRects) {
+        if(drawRects) {
           p.noStroke()
           p.fill(col)
           p.rect(0, 0, xSize, ySize)
