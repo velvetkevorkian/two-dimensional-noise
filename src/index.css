@@ -8,3 +8,19 @@ body {
   background: #000;
   overflow: hidden;
 }
+
+p {
+  text-align: center;
+  font-family: monospace, sans-serif;
+  color: white;
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  font-size: 0.8em;
+  opacity: 0.65;
+}
+
+p:hover {
+  opacity: 1;
+}
