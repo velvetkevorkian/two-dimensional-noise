@@ -5,7 +5,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 module.exports = {
   entry: './src/index.js',
   plugins: [
-    new CleanWebpackPlugin(['two-dimensional-noise']),
+    new CleanWebpackPlugin(['docs']),
     new HtmlWebpackPlugin({
       title: 'Chapter 5: Two dimensional noise',
       template: 'index.html'
@@ -13,7 +13,7 @@ module.exports = {
   ],
   output: {
     filename: '[name].[contenthash].js',
-    path: path.resolve(__dirname, 'two-dimensional-noise')
+    path: path.resolve(__dirname, 'docs')
   },
   optimization: {
     splitChunks: {
